@@ -28,7 +28,7 @@ def list_books(request: Request) -> list[Book]:
 def find_book(book_id: str, request: Request) -> Book:
     if (book := request.app.state.database["books"].find_one({"_id": book_id})) is not None:
         return book
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {id} not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {book_id} not found")
 
 
 @router.put("/{book_id}", response_description="Update a book")

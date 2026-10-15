@@ -63,7 +63,7 @@ def test_create_book_missing_title() -> None:
 
 def test_create_book_missing_author() -> None:
     with TestClient(app) as client:
-        response = client.post("/book/", json={"title": "Don Quixote", "author": "Miguel de Cervantes"})
+        response = client.post("/book/", json={"title": "Don Quixote", "synopsis": "..."})
         assert response.status_code == 422
 
 
