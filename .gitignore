@@ -6,6 +6,9 @@
 
 # Cache
 __pycache__
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
 
 # API Key
 .env.local

@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import Any
 
 import uvicorn
 from fastapi import FastAPI
@@ -22,7 +23,7 @@ settings = Settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
-    client = MongoClient(settings.ATLAS_URI)
+    client: MongoClient[dict[str, Any]] = MongoClient(settings.ATLAS_URI)
 
     try:
         client.admin.command("ping")

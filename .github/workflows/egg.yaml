@@ -1,0 +1,46 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  books-crud-test:
+    name: Test books crud
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9
+        with:
+          version: "0.9.18"
+
+      - name: Install Python
+        run: uv python install
+
+      - name: Install dependencies
+        run: uv sync --locked --dev
+
+      - name: Lint Python code
+        run: uv run ruff check .
+
+      - name: Check Python formatting
+        run: uv run ruff format --check .
+
+      - name: Check Python types
+        run: uv run mypy .
+
+      - name: Run tests
+        env:
+          ATLAS_URI: ${{ secrets.ATLAS_URI }}
+          DB_NAME: mongo_start_ci
+          RETRY_WRITES: "true"
+        run: |
+          if [ -z "$ATLAS_URI" ]; then
+            echo "::error::Set the ATLAS_URI repository secret to a test MongoDB connection URI."
+            exit 1
+          fi
+          uv run pytest test_books_crud.py -v
