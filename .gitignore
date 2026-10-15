@@ -1,0 +1,11 @@
+# Venv
+.venv
+
+# Macos
+.DS_Store
+
+# Cache
+__pycache__
+
+# API Key
+.env.local
