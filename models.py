@@ -18,7 +18,7 @@ class Book(BaseModel):
                 "title": "Don Quixote",
                 "author": "Miguel de Cervantes",
                 "synopsis": "...",
-            }
+            },
         },
     )
 
@@ -34,6 +34,6 @@ class BookUpdate(BaseModel):
                 "title": "Don Quixote",
                 "author": "Miguel de Cervantes",
                 "synopsis": "Don Quixote is a Spanish novel by Miguel de Cervantes...",
-            }
+            },
         },
     )

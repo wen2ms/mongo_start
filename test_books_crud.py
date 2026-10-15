@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -22,7 +23,7 @@ settings = Settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
-    client = MongoClient(settings.ATLAS_URI)
+    client: MongoClient[dict[str, Any]] = MongoClient(settings.ATLAS_URI)
 
     try:
         client.admin.command("ping")
@@ -43,7 +44,8 @@ app.include_router(book_router, tags=["books"], prefix="/book")
 def test_create_book() -> None:
     with TestClient(app) as client:
         response = client.post(
-            "/book/", json={"title": "Don Quixote", "author": "Miguel de Cervantes", "synopsis": "..."}
+            "/book/",
+            json={"title": "Don Quixote", "author": "Miguel de Cervantes", "synopsis": "..."},
         )
         assert response.status_code == 201
         body = response.json()
@@ -68,7 +70,8 @@ def test_create_book_missing_author() -> None:
 def test_get_book() -> None:
     with TestClient(app) as client:
         new_book = client.post(
-            "/book/", json={"title": "Don Quixote", "author": "Miguel de Cervantes", "synopsis": "..."}
+            "/book/",
+            json={"title": "Don Quixote", "author": "Miguel de Cervantes", "synopsis": "..."},
         ).json()
 
         get_book_response = client.get("/book/" + new_book.get("_id"))
@@ -85,7 +88,8 @@ def test_get_book_unexisting() -> None:
 def test_update_book() -> None:
     with TestClient(app) as client:
         new_book = client.post(
-            "/book/", json={"title": "Don Quixote", "author": "Miguel de Cervantes", "synopsis": "..."}
+            "/book/",
+            json={"title": "Don Quixote", "author": "Miguel de Cervantes", "synopsis": "..."},
         ).json()
 
         response = client.put("/book/" + new_book.get("_id"), json={"title": "Don Quixote 1"})
@@ -102,7 +106,8 @@ def test_update_book_unexisting() -> None:
 def test_delete_book() -> None:
     with TestClient(app) as client:
         new_book = client.post(
-            "/book/", json={"title": "Don Quixote", "author": "Miguel de Cervantes", "synopsis": "..."}
+            "/book/",
+            json={"title": "Don Quixote", "author": "Miguel de Cervantes", "synopsis": "..."},
         ).json()
 
         delete_book_response = client.delete("/book/" + new_book.get("_id"))

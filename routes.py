@@ -24,29 +24,29 @@ def list_books(request: Request) -> list[Book]:
     return books
 
 
-@router.get("/{id}", response_description="Get a single book by id")
-def find_book(id: str, request: Request) -> Book:
-    if (book := request.app.state.database["books"].find_one({"_id": id})) is not None:
+@router.get("/{book_id}", response_description="Get a single book by id")
+def find_book(book_id: str, request: Request) -> Book:
+    if (book := request.app.state.database["books"].find_one({"_id": book_id})) is not None:
         return book
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {id} not found")
 
 
-@router.put("/{id}", response_description="Update a book")
-def update_book(id: str, request: Request, book: BookUpdate) -> Book:
+@router.put("/{book_id}", response_description="Update a book")
+def update_book(book_id: str, request: Request, book: BookUpdate) -> Book:
     updated_book = book.model_dump(exclude_unset=True)
     if updated_book:
-        update_result = request.app.state.database["books"].update_one({"_id": id}, {"$set": updated_book})
+        update_result = request.app.state.database["books"].update_one({"_id": book_id}, {"$set": updated_book})
         if update_result.matched_count == 0:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {id} not found")
-    if (existing_book := request.app.state.database["books"].find_one({"_id": id})) is not None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {book_id} not found")
+    if (existing_book := request.app.state.database["books"].find_one({"_id": book_id})) is not None:
         return existing_book
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {id} not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {book_id} not found")
 
 
-@router.delete("/{id}", response_description="Delete a book")
-def delete_book(id: str, request: Request, response: Response) -> Response:
-    delete_result = request.app.state.database["books"].delete_one({"_id": id})
+@router.delete("/{book_id}", response_description="Delete a book")
+def delete_book(book_id: str, request: Request, response: Response) -> Response:
+    delete_result = request.app.state.database["books"].delete_one({"_id": book_id})
     if delete_result.deleted_count == 1:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {id} not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {book_id} not found")
