@@ -6,6 +6,8 @@ from fastapi import FastAPI
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pymongo import MongoClient
 
+from routes import router as book_router
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env.local", env_file_encoding="utf-8")
@@ -34,6 +36,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.include_router(book_router, tags=["books"], prefix="/book")
 
 
 if __name__ == "__main__":

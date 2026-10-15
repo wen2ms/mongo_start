@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, HTTPException, Request, Response, status
 from fastapi.encoders import jsonable_encoder
+from pymongo.errors import DuplicateKeyError
 
 from models import Book, BookUpdate
 
@@ -10,8 +11,11 @@ router = APIRouter()
 
 @router.post("/", response_description="Create a new book", status_code=status.HTTP_201_CREATED)
 def create_book(request: Request, book: Book) -> Book:
-    book = jsonable_encoder(book)
-    new_book = request.app.state.database["books"].insert_one(book)
+    document = jsonable_encoder(book, by_alias=True)
+    try:
+        new_book = request.app.state.database["books"].insert_one(document)
+    except DuplicateKeyError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Book already exists.") from exc
     created_book = request.app.state.database["books"].find_one({"_id": new_book.inserted_id})
     return created_book
 
@@ -24,7 +28,7 @@ def list_books(request: Request) -> list[Book]:
 
 @router.get("/{id}", response_description="Get a single book by id")
 def find_book(id: str, request: Request) -> Book:
-    if (book := request.app.database["books"].find_one({"_id": id})) is not None:
+    if (book := request.app.state.database["books"].find_one({"_id": id})) is not None:
         return book
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {id} not found")
 
