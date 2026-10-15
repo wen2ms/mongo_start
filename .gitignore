@@ -9,3 +9,4 @@ __pycache__
 
 # API Key
 .env.local
+.env.test

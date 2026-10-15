@@ -4,7 +4,7 @@ version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[all]>=0.143.1",
-    "pymongo[srv]>=4.19.0",
+    "pymongo>=4.19.0",
     "python-dotenv>=1.2.4",
 ]
 
@@ -26,3 +26,9 @@ ignore = [
 quote-style = "double"
 indent-style = "space"
 line-ending = "lf"
+
+[dependency-groups]
+dev = [
+    "httpx2>=2.13.1",
+    "pytest>=9.1.1",
+]
